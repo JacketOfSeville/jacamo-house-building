@@ -9,7 +9,10 @@ my_price(300). // crença inicial
 
 +currentBid(V)[artifact_id(Art)]         // Tem um valor novo para o lance atual
     : not i_am_winning(Art)  &           // Não sou o vencedor atual
-      my_price(P) & P < V                // Eu posso oferecer um lance melhor
+      
+      // Eu posso oferecer um lance melhor, 
+      // onde V é o valor do maior lance atual, e é maior que P
+      my_price(P) & P < V                
    <- .print("My bid in artifact ", Art, " is ",P);
       bid( P ).                          // fazer meu lance oferecendo um serviço mais barato
 
