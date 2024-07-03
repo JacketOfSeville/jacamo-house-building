@@ -16,11 +16,16 @@ task_roles("Painting",         [painter]).
       for ( .member( Role, Roles) ) {
          adoptRole(Role)[artifact_id(GroupId)];
          focus(GroupId);
+         !assign_task(Task, Role, GroupName); // assign the task to the role
       }.
 
 -!contract(Service,GroupName)[error(E),error_msg(Msg),code(Cmd),code_src(Src),code_line(Line)]
    <- .print("Não conseguiu assinar o contrato de ",Service,"/",GroupName,": ",Msg," (",E,"). comando: ",Cmd, " no ",Src,":", Line).
 
+
++!assign_task(Task, Role, GroupName)
+   <- lookupArtifact(Task, TaskId);
+      .send(TaskId, assign, Role, GroupName).
 
 +!in_ora4mas : in_ora4mas.
 +!in_ora4mas : .intend(in_ora4mas)

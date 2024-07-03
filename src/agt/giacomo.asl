@@ -32,36 +32,45 @@ number_of_tasks(NS) :- .findall( S, task(S), L) & .length(L,NS).
 // de artefatos de leilões e então esperar lances
 +!contract
    <- !create_auction_artifacts;
+      !start_auctions;
       !wait_for_bids.
 //      !dispose_auction_artifacts.
 
 // O plano para criar o leilão para cada tarefa envolvida
 // na construção da casa (ex: chão, paredes, etc.)
 +!create_auction_artifacts
-   <-  !create_auction_artifact("SitePreparation", 2000); // 2000 é o valor máximo que posso pagar pela tarefa
-       !create_auction_artifact("Floors",          1000);
-       !create_auction_artifact("Walls",           1000);
-       !create_auction_artifact("Roof",            2000);
-       !create_auction_artifact("WindowsDoors",    2500);
-       !create_auction_artifact("Plumbing",         500);
-       !create_auction_artifact("ElectricalSystem", 500);
-       !create_auction_artifact("Painting",        1200).
+   <-  !create_auction_artifact("SitePreparation", 2000, 30000); // 2000 é o valor máximo que posso pagar pela tarefa, 30 é o prazo de lance
+       !create_auction_artifact("Floors",          1000, 30000);
+       !create_auction_artifact("Walls",           1000, 30000);
+       !create_auction_artifact("Roof",            2000, 30000);
+       !create_auction_artifact("WindowsDoors",    2500, 30000);
+       !create_auction_artifact("Plumbing",         500, 30000);
+       !create_auction_artifact("ElectricalSystem", 500, 30000);
+       !create_auction_artifact("Painting",        1200, 30000).
 
 // Plano para a criação de um único leilão para uma tarefa
-// específica, com um preço máximo
-+!create_auction_artifact(Task,MaxPrice)
+// específica, com um preço máximo e prazo de lance
++!create_auction_artifact(Task,MaxPrice,BiddingTime)
    <- .concat("auction_for_",Task,ArtName); // Concatena a string com 'Task' e armazena em 'ArtName'
-      makeArtifact(ArtName, "tools.AuctionArt", [Task, MaxPrice], ArtId); // cria o artefato com o nome, tarefa, preço e ID
+      makeArtifact(ArtName, "tools.AuctionArt", [Task, MaxPrice, BiddingTime], ArtId); // cria o artefato com o nome, tarefa, preço e ID
       focus(ArtId). // Foca neste artefato
 
 // Plano para contingência de error proferidos da criação do leilão
--!create_auction_artifact(Task,MaxPrice)[error_code(Code)]
+-!create_auction_artifact(Task,MaxPrice,BiddingTime)[error_code(Code)]
    <- .print("Error creating artifact ", Code).
 
-// Plano para aguardar por 5 segundos e então anunciar os ganhadores
+// Plano para iniciar os leilões
++!start_auctions 
+// NEEDS FIXING
+// Could not send <mid1->giacomo,giacomo,command,cobj_10,startAuction> (receiver_not_found). 
+// Commando: .send(cobj_10,command,startAuction,giacomo) no file:src/agt/giacomo.asl:65
+   <- for ( task(_)[artifact_id(ArtId)] ) {
+        .send(ArtId, command, startAuction); // inicia o leilão
+      }.
+
+// Plano para aguardar por lances
 +!wait_for_bids
-   <- println("Waiting bids for 5 seconds...");
-      .wait(5000); // utiliza um prazo interno de 5 segundos para fechar os leilões
+   <- .wait(5000); // utiliza um prazo interno de 5 segundos para fechar os leilões
       !show_winners.
 
 // Plano para o anuncio de cada ganhador de cada tarefa
