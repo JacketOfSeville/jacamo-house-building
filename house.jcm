@@ -17,4 +17,7 @@ mas house_building {
       instances: 13
    }
    agent companyE
+   agent companyF {
+      instances: 2
+   }
 }
