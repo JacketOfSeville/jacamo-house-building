@@ -21,3 +21,22 @@ mas house_building {
       instances: 2
    }
 }
+
+// Exercicio 5 e 6
+// mas house_building {
+
+//    agent diacomo     // o agente que quer construir uma casa
+
+//    agent empresaA   // agentes construtores (veja seu código para detalhes)
+//    agent empresaB
+//    agent empresaC {
+//       instances: 5
+//    }
+//    agent empresaD {
+//       instances: 13
+//    }
+//    agent empresaE
+//    agent empresaF {
+//       instances: 2
+//    }
+// }
