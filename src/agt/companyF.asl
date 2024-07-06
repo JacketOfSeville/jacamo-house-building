@@ -1,37 +1,28 @@
-// Empresa de preparação de site
-
 { include("common.asl") }
 
-// Crenças iniciais para cada tipo de leilão
-my_price("SitePreparation", 1000).
+my_price(200).
 
-// Ativa o agente para começar a leiloar para a tarefa de preparação de site
-!discover_art("auction_for_SitePreparation").
+sum_of_my_offers(S) :-
+   .my_name(Me) & .term2string(Me,MeS) &
+   .findall( V,      // encontra os leilões em que está ganhando
+             currentWinner(MeS)[artifact_id(ArtId)] &
+             currentBid(V)[artifact_id(ArtId)],
+             L) &
+   S = math.sum(L).
 
-//Detecta se há um novo valor para o lance atual
-+currentBid(V)[artifact_id(Art)]  
-    // Se a tarefa for a preparação do solo
-    : task("SitePreparation")[artifact_id(Art)] &
-      
-      // Poder oferecer um preço melhor na tarefa
-      my_price("SitePreparation",P) &
+!discover_art("auction_for_Floors").
+!discover_art("auction_for_Walls").
+!discover_art("auction_for_Roof").
 
-      // Não estiver ganhando
-      not i_am_winning(Art) & 
 
-      // onde V é o valor do maior lance atual, 
-      // e é maior que P
-      P < V        
-                  
-   <- .print("My bid in artifact ", Art, ", at Task SitePreparation, is ", P);
-      bid( P )[ artifact_id(Art) ].
-
-// Estratégia de lance: lance 10% abaixo do preço máximo
-+!bid_strategy
-   <- ?currentBid(V)[artifact_id(Art)] &
-      my_price("SitePreparation",P) &
-      NewBid = P - (P * 0.1) &
-      bid( NewBid )[ artifact_id(Art) ].
++currentBid(V)[artifact_id(Art)]      // há um novo valor para o lance atual
+    : not i_am_winning(Art) &         // se eu não sou o vencedor
+      my_price(P) &
+      sum_of_my_offers(Sum) & 
+      task(S)[artifact_id(Art)] &
+      P < Sum + V                     // e Ainda posso oferecer um lance melhor
+   <- //.print("Meu lance no artefato ", Art, ", Task ", S,", é ",math.max(V-10,P));
+      bid( math.max(V-10,P) )[ artifact_id(Art) ].  // faço meu lance oferecendo um serviço mais barato
 
 /* planos para fase de execução */
 

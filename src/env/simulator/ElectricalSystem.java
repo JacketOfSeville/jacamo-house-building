@@ -8,7 +8,7 @@ public class ElectricalSystem implements HousePart {
 
     public void draw(Dimension size, Graphics2D g){
         g.setColor(Color.BLACK);
-        g.drawString("Electtrical Systems OK", 20, 40);
+        g.drawString("Sistema Elétrico OK", 20, 40);
     }
 
 }
